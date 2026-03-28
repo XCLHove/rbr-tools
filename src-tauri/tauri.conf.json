@@ -1,0 +1,59 @@
+{
+  "$schema": "tauri.conf.schema.json",
+  "productName": "rbr-tools",
+  "version": "0.260328.211223",
+  "identifier": "com.xclhove.rbr-tools",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:11420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "RBR Tools",
+        "width": 960,
+        "height": 540
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "createUpdaterArtifacts": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": true,
+        "languages": [
+          "SimpChinese",
+          "English"
+        ]
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "windows": {
+        "installMode": "basicUi"
+      },
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE4RDFGN0UyMDlFNDM1NTcKUldSWE5lUUo0dmZSR0phWjdEU0ZWM29UQnIrVHpIMjBwUnNqUGlERURPTzF0bkZvaW1FUnNyYk0K",
+      "endpoints": [
+        "https://gitee.com/xclhove/rbr-tools/releases/download/latest/latest-gitee.json",
+        "https://github.com/xclhove/rbr-tools/releases/latest/download/latest-github.json"
+      ]
+    }
+  }
+}

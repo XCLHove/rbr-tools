@@ -1,0 +1,46 @@
+[package]
+name = "rbr-tools"
+version = "0.260328.211223"
+description = "RBRi18n Installer"
+authors = [ "xclhove" ]
+edition = "2021"
+
+[lib]
+name = "rbr_tools_lib"
+crate-type = [ "staticlib", "cdylib", "rlib" ]
+
+[build-dependencies.tauri-build]
+version = "2"
+features = [ ]
+
+[dependencies]
+tauri-plugin-opener = "2"
+serde_json = "1"
+tauri-plugin-process = "2"
+log = "0.4.29"
+log4rs = "1.4.0"
+zip = "0.5"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-store = "2"
+lazy_static = "1.5.0"
+notify = "8.2.0"
+
+  [dependencies.tauri]
+  version = "2"
+  features = [ "image-png", "tray-icon" ]
+
+  [dependencies.serde]
+  version = "1"
+  features = [ "derive" ]
+
+  [dependencies.reqwest]
+  version = "0.11"
+  features = [ "blocking", "json" ]
+
+  [dependencies.tokio]
+  version = "1"
+  features = [ "full" ]
+
+[target."cfg(not(any(target_os = \"android\", target_os = \"ios\")))".dependencies]
+tauri-plugin-updater = "2"
