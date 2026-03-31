@@ -117,6 +117,7 @@ function getRBRi18nInfo() {
 }
 
 onMounted(async () => {
+  await rbrToolsStore.waitingLoad()
   await checkRBRi18nInstallStatus()
   getLatestReleaseInfo()
   getGithubReleaseList()
