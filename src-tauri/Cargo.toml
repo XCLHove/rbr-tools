@@ -1,6 +1,6 @@
 [package]
 name = "rbr-tools"
-version = "0.260331.224523"
+version = "0.260404.155153"
 description = "RBRi18n Installer"
 authors = [ "xclhove" ]
 edition = "2021"
@@ -25,6 +25,7 @@ tauri-plugin-dialog = "2"
 tauri-plugin-store = "2"
 lazy_static = "1.5.0"
 notify = "8.2.0"
+fontdb = "0.23.0"
 
   [dependencies.tauri]
   version = "2"

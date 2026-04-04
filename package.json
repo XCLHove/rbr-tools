@@ -1,7 +1,7 @@
 {
   "name": "rbr-tools",
   "private": true,
-  "version": "0.260331.224523",
+  "version": "0.260404.155153",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -27,6 +27,7 @@
     "axios": "^1.13.6",
     "dayjs": "^1.11.20",
     "element-plus": "^2.13.6",
+    "ini": "^6.0.0",
     "md-editor-v3": "^6.4.1",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.2.2",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@iarna/toml": "^2.2.5",
     "@tauri-apps/cli": "^2",
+    "@types/ini": "^4.1.1",
     "@types/node": "^25.5.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "prettier": "^3.8.1",

@@ -2,6 +2,7 @@ mod cancel_config_readonly;
 mod file_log;
 mod path_utils;
 mod rbr_tools;
+mod rbri18n_config;
 mod rbri18n_installer;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -26,7 +27,11 @@ pub fn run() {
             cancel_config_readonly::cancel_config_readonly,
             cancel_config_readonly::get_is_enable_auto_cancel_config_readonly,
             cancel_config_readonly::enable_auto_cancel_config_readonly,
-            cancel_config_readonly::disabled_auto_cancel_readonly
+            cancel_config_readonly::disabled_auto_cancel_readonly,
+            rbri18n_config::read_rbr_config,
+            rbri18n_config::write_rbr_config,
+            rbri18n_config::list_rbri18n_file,
+            rbri18n_config::list_font_family
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
