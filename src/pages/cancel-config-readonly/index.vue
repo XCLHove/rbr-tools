@@ -98,7 +98,7 @@ onMounted(async () => {
         active-text="已开启"
         inactive-text="已关闭"
         inline-prompt
-        @change="(v) => switchAutoCancelConfigReadonly(v as boolean)"
+        @change="(v: any) => switchAutoCancelConfigReadonly(v as boolean)"
       ></el-switch>
     </div>
     <page-readme :url="ReadmeUrl" />

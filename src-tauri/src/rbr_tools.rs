@@ -12,9 +12,11 @@ pub async fn validate_rbr_install_path(
     if !fs::exists(rbr_install_path.clone()).map_err(|e| e.to_string())? {
         return Ok(json!({ "valid": false, "message": "安装目录不存在" }));
     }
-    let rbr_exe_path = rbr_install_path.clone() + "/richardburnsrally.exe";
+    let rbr_exe_path = rbr_install_path.clone() + "/RichardBurnsRally_SSE.exe";
     if !fs::exists(rbr_exe_path.clone()).map_err(|e| e.to_string())? {
-        return Ok(json!({ "valid": false, "message": "安装目录不正确" }));
+        return Ok(
+            json!({ "valid": false, "message": format!("安装目录不正确：未找到文件【{}】", rbr_exe_path) }),
+        );
     }
 
     Ok(json!({ "valid": true, "message": "" }))
