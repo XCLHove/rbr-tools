@@ -4,6 +4,12 @@ import { getVersion } from '@tauri-apps/api/app'
 import { check } from '@tauri-apps/plugin-updater'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { log_error } from '@/invoke-apis/file-log.ts'
+import axios from 'axios'
+import { GithubReleaseInfo } from '@/pages/update/type.ts'
+import MarkdownPreview from '@/components/markdown-preview/markdown-preview.vue'
+import { writeText } from '@tauri-apps/plugin-clipboard-manager'
+import { useLoading } from '@/utils/LoadingUtils.ts'
+import { decodeMulti } from '@/utils/base64Utils.ts'
 
 const currentVersion = ref('')
 const latestVersion = ref('')
@@ -15,8 +21,21 @@ const downloadPercentage = computed(() => {
   if (currentDownLoadSize.value === 0) return 0
   return Math.ceil((currentDownLoadSize.value / totalDownloadSize.value) * 100)
 })
-const loading = ref(true)
-const loadingText = ref('加载中...')
+const checkTimeout = 3 * 1000
+const { loadingStart, loading, loadingText } = useLoading()
+const downloadLinkList = ref([
+  { name: 'gitee', url: 'https://gitee.com/xclhove/rbr-tools/releases/latest' },
+  { name: 'github', url: 'https://github.com/xclhove/rbr-tools/releases/latest' },
+  {
+    name: 'github(xclhove)',
+    url: decodeMulti('YUhSMGNITTZMeTluYVhSb2RXSXVlR05zYUc5MlpTNTBiM0F2ZUdOc2FHOTJaUzl5WW5JdGRHOXZiSE12Y21Wc1pXRnpaWE12YkdGMFpYTjA='),
+  },
+])
+
+const user = 'xclhove'
+const repo = 'rbr-tools'
+const githubReleaseInfoList = ref<GithubReleaseInfo[]>([])
+const latestReleaseInfo = ref<GithubReleaseInfo | null>(null)
 
 onMounted(() => {
   init()
@@ -25,6 +44,8 @@ onMounted(() => {
 function init() {
   checkCurrentVersion()
   checkLatestVersion()
+  getReleaseList()
+  getLatestRelease()
 }
 
 async function checkCurrentVersion() {
@@ -33,7 +54,9 @@ async function checkCurrentVersion() {
 
 async function checkLatestVersion(showMessage?: boolean) {
   const loadingEnd = loadingStart()
-  check()
+  check({
+    timeout: checkTimeout,
+  })
     .then((newUpdate) => {
       if (!newUpdate) return
       latestVersion.value = newUpdate?.version
@@ -53,7 +76,9 @@ async function checkLatestVersion(showMessage?: boolean) {
 
 async function downloadAndInstall() {
   const loadingEnd = loadingStart('准备中...')
-  const update = await check().finally(() => loadingEnd())
+  const update = await check({
+    timeout: checkTimeout,
+  }).finally(() => loadingEnd())
   if (!update) return
   totalDownloadSize.value = 0
   currentDownLoadSize.value = 0
@@ -92,12 +117,44 @@ function formatBytes(bytes: number) {
   return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`
 }
 
-function loadingStart(text?: string) {
-  loadingText.value = text || '加载中...'
-  loading.value = true
+async function getReleaseList() {
+  const loadingEnd = loadingStart('获取插件信息...')
+  await axios
+    .get<GithubReleaseInfo[]>(`https://api.github.com/repos/${user}/${repo}/releases`, {
+      timeout: 5 * 1000,
+    })
+    .then((r) => {
+      githubReleaseInfoList.value = r.data || []
+    })
+    .catch((e) => {
+      const errorMessage = e?.message || e?.toString()
+      log_error(errorMessage)
+      ElMessage.error(`获取插件信息出错：${errorMessage}`)
+    })
+    .finally(() => loadingEnd())
+}
 
-  const loadingEnd = () => (loading.value = false)
-  return loadingEnd
+async function getLatestRelease() {
+  const loadingEnd = loadingStart('获取插件最新版本信息...')
+  await axios
+    .get<GithubReleaseInfo>(`https://api.github.com/repos/${user}/${repo}/releases/latest`, {
+      timeout: 5 * 1000,
+    })
+    .then((r) => {
+      latestReleaseInfo.value = r.data
+    })
+    .catch((e) => {
+      const errorMessage = e?.message || e?.toString()
+      log_error(errorMessage)
+      ElMessage.error(`获取插件最新版本信息出错：${errorMessage}`)
+    })
+    .finally(() => loadingEnd())
+}
+
+function copyDownloadUrl(url: string) {
+  writeText(url).then(() => {
+    ElMessage.success('已复制链接到剪贴板！')
+  })
 }
 </script>
 
@@ -107,18 +164,45 @@ function loadingStart(text?: string) {
       <el-descriptions-item label="当前版本">
         {{ currentVersion || '未知' }}
       </el-descriptions-item>
+
       <el-descriptions-item label="最新版本">
         <div class="flex items-center">
-          <el-text :type="updateAvailable ? 'success' : ''">{{ latestVersion || '未知' }}</el-text>
+          <el-text :type="updateAvailable ? 'success' : ''">{{ latestVersion || latestReleaseInfo?.tag_name || '未知' }}</el-text>
         </div>
       </el-descriptions-item>
-      <el-descriptions-item label="更新日志"> 开发中... </el-descriptions-item>
+
+      <el-descriptions-item label="下载地址">
+        <el-descriptions border :column="1">
+          <el-descriptions-item v-for="link in downloadLinkList" :key="link.name" :label="link.name">
+            <el-button link type="primary" @click="copyDownloadUrl(link.url)">{{ link.url }}</el-button>
+          </el-descriptions-item>
+        </el-descriptions>
+      </el-descriptions-item>
+
+      <el-descriptions-item label="更新日志">
+        <el-table border :data="githubReleaseInfoList" default-expand-all height="calc(100vh - 330px)">
+          <el-table-column type="expand" width="50" align="center">
+            <template #default="{ row }: { row: GithubReleaseInfo }">
+              <markdown-preview :model-value="row.body" />
+            </template>
+          </el-table-column>
+          <el-table-column label="版本">
+            <template #default="{ row }: { row: GithubReleaseInfo }">
+              <div class="flex">
+                <el-tag type="primary">{{ row.tag_name }}</el-tag>
+                <el-tag type="success" v-if="row.id === latestReleaseInfo?.id">最新版本</el-tag>
+                <el-tag type="success" v-if="row.tag_name === currentVersion">当前版本</el-tag>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-descriptions-item>
     </el-descriptions>
 
     <div class="flex flex-col mt-auto p-1 w-full">
       <el-button type="success" @click="checkLatestVersion(true)">检查更新</el-button>
       <div class="w-full flex flex-col mt-1">
-        <el-button v-show="updateAvailable && !downloading" type="primary" @click="downloadAndInstall">下载并安装</el-button>
+        <el-button v-show="updateAvailable && !downloading" type="primary" @click="downloadAndInstall">下载并安装新版</el-button>
         <el-progress
           v-show="downloading"
           :format="formatPercentageText"

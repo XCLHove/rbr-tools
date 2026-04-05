@@ -6,9 +6,10 @@ export const checkRBRi18nInstallStatusApi = (rbrInstallPath: string) => {
   })
 }
 
-export const installRBRi18nApi = (rbrInstallPath: string, zipFileUrl: string) => {
+export const installRBRi18nApi = (rbrInstallPath: string, zipFileUrl: string, timeoutSeconds: number = 15) => {
   return invokeWrapper<string>('install_rbri18n', {
     rbrInstallPath,
     zipFileUrl,
+    timeoutSeconds,
   })
 }

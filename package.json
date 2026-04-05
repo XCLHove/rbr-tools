@@ -1,7 +1,7 @@
 {
   "name": "rbr-tools",
   "private": true,
-  "version": "0.260404.155153",
+  "version": "0.260405.185245",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,6 +28,7 @@
     "dayjs": "^1.11.20",
     "element-plus": "^2.13.6",
     "ini": "^6.0.0",
+    "js-base64": "^3.7.8",
     "md-editor-v3": "^6.4.1",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.2.2",

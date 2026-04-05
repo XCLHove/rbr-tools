@@ -11,6 +11,9 @@ import { Refresh } from '@element-plus/icons-vue'
 import useRbrToolsStore from '@/stores/useRbrToolsStore.ts'
 import { storeToRefs } from 'pinia'
 import RbrInstallPathText from '@/components/rbr-install-path-text/rbr-install-path-text.vue'
+import PageReadme from '@/components/page-readme/page-readme.vue'
+import ReadmeUrl from './README.md?url'
+import { decodeMulti } from '@/utils/base64Utils.ts'
 
 const rbrToolsStore = useRbrToolsStore()
 const { rbrInstallPath, rbrInstallPathValid } = storeToRefs(rbrToolsStore)
@@ -24,6 +27,12 @@ const latestReleaseInfo = ref<GithubReleaseInfo | null>(null)
 const currentReleaseAsserts = computed(() => currentReleaseInfo.value?.assets || [])
 const i18nInstallStatus = ref<'已安装' | '未安装' | '未知'>('未知')
 
+const mirrorUrlList = ref<string[]>([decodeMulti('YUhSMGNITTZMeTluYVhSb2RXSXVlR05zYUc5MlpTNTBiM0E9')])
+const mirror = ref({
+  enable: false,
+  url: mirrorUrlList.value[0],
+})
+
 watch(
   () => githubReleaseInfoList.value,
   () => {
@@ -31,10 +40,16 @@ watch(
   },
 )
 
-function getGithubReleaseList() {
+async function getRelease() {
+  await Promise.all([getLatestRelease(), getReleaseList()])
+}
+
+async function getReleaseList() {
   const loadingEnd = loadingStart('获取插件信息...')
-  axios
-    .get<GithubReleaseInfo[]>(`https://api.github.com/repos/${user}/${repo}/releases`)
+  await axios
+    .get<GithubReleaseInfo[]>(`https://api.github.com/repos/${user}/${repo}/releases`, {
+      timeout: 5 * 1000,
+    })
     .then((r) => {
       githubReleaseInfoList.value = r.data
     })
@@ -46,10 +61,12 @@ function getGithubReleaseList() {
     .finally(() => loadingEnd())
 }
 
-async function getLatestReleaseInfo() {
+async function getLatestRelease() {
   const loadingEnd = loadingStart('获取插件最新版本信息...')
   await axios
-    .get<GithubReleaseInfo>(`https://api.github.com/repos/${user}/${repo}/releases/latest`)
+    .get<GithubReleaseInfo>(`https://api.github.com/repos/${user}/${repo}/releases/latest`, {
+      timeout: 5 * 1000,
+    })
     .then((r) => {
       latestReleaseInfo.value = r.data
     })
@@ -88,8 +105,8 @@ async function install(asset: Asset) {
   }
 
   const loadingEnd = loadingStart('正在安装...')
-  installRBRi18nApi(rbrInstallPath.value, asset.browser_download_url)
-    .then((r) => {
+  installRBRi18nApi(rbrInstallPath.value, replaceWithMirrorUrl(asset.browser_download_url))
+    .then(() => {
       checkRBRi18nInstallStatus()
       ElMessage.success('安装成功！')
     })
@@ -100,7 +117,7 @@ async function install(asset: Asset) {
 }
 
 function copyDownloadUrl(asset: Asset) {
-  writeText(asset.browser_download_url)
+  writeText(replaceWithMirrorUrl(asset.browser_download_url))
     .then(() => {
       ElMessage.success('已复制下载链接到剪贴板！')
     })
@@ -111,16 +128,30 @@ function copyDownloadUrl(asset: Asset) {
     })
 }
 
-function getRBRi18nInfo() {
-  getLatestReleaseInfo()
-  getGithubReleaseList()
+function mirrorUrlFetchSuggestions(queryString: string, callback: Function) {
+  const list = mirrorUrlList.value
+    .filter((url) => url.includes(queryString))
+    .map((url) => ({
+      value: url,
+    }))
+  callback(list)
+}
+
+function replaceWithMirrorUrl(url: string) {
+  if (!mirror.value.enable) return url
+  if (!mirror.value.url) return url
+  return url.replace('https://github.com', mirror.value.url)
+}
+
+function onChangeMirrorEnable(enable: boolean) {
+  if (!enable) return
+  ElMessage.warning('使用镜像时建议关闭加速器或相关程序否则会下载失败！')
 }
 
 onMounted(async () => {
   await rbrToolsStore.waitingLoad()
   await checkRBRi18nInstallStatus()
-  getLatestReleaseInfo()
-  getGithubReleaseList()
+  await getRelease()
 })
 </script>
 
@@ -145,12 +176,21 @@ onMounted(async () => {
 
         <template #prefix>版本</template>
       </el-select>
-      <el-button :icon="Refresh" type="primary" @click="getRBRi18nInfo">重新获取插件信息</el-button>
+      <el-button :icon="Refresh" type="primary" @click="getRelease">重新获取插件信息</el-button>
+    </div>
+    <div class="flex mt-1">
+      <el-checkbox v-model="mirror.enable" label="使用镜像地址(推荐开启)" :value="true" @change="(v: any) => onChangeMirrorEnable(v)"></el-checkbox>
+      <el-autocomplete
+        :disabled="!mirror.enable"
+        v-model="mirror.url"
+        placeholder="请输入镜像地址"
+        :fetch-suggestions="mirrorUrlFetchSuggestions"
+      ></el-autocomplete>
     </div>
     <el-table :data="currentReleaseAsserts" border class="mt-1" default-expand-all show-overflow-tooltip>
       <el-table-column type="expand">
         <template #default="{ row }">
-          <el-button link type="primary" @click="copyDownloadUrl(row)">{{ row.browser_download_url }}</el-button>
+          <el-button link type="primary" @click="copyDownloadUrl(row)">{{ replaceWithMirrorUrl(row.browser_download_url) }}</el-button>
         </template>
       </el-table-column>
       <el-table-column label="文件名称" prop="name"></el-table-column>
@@ -167,6 +207,7 @@ onMounted(async () => {
         </template>
       </el-table-column>
     </el-table>
+    <page-readme :url="ReadmeUrl" />
   </div>
 </template>
 
