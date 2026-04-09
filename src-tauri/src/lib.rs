@@ -4,6 +4,7 @@ mod path_utils;
 mod rbr_tools;
 mod rbri18n_config;
 mod rbri18n_installer;
+mod rsf_config;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -31,7 +32,9 @@ pub fn run() {
             rbri18n_config::read_rbr_config,
             rbri18n_config::write_rbr_config,
             rbri18n_config::list_rbri18n_file,
-            rbri18n_config::list_font_family
+            rbri18n_config::list_font_family,
+            rsf_config::write_rsf_config,
+            rsf_config::read_rsf_config
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
