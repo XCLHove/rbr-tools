@@ -33,7 +33,6 @@ function refreshRsfConfig(options?: { showMessage?: boolean }) {
     .then((iniText) => {
       const config = parse(iniText)
       rsfConfig.value = Object.assign(getDefaultRsfConfig(), config)
-      console.log(simpleClone(rsfConfig.value))
       if (options?.showMessage) {
         ElMessage.success('配置读取成功！')
       }
