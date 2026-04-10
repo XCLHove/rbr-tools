@@ -3,6 +3,7 @@ import { getName } from '@tauri-apps/api/app'
 
 export const tauriStoreKey = {
   RBR_INSTALL_PATH: 'RBR_INSTALL_PATH',
+  RBR_TOOLS_DONATION_CODE: 'RBR_TOOLS_DONATION_CODE',
 }
 
 let store: ReturnType<typeof load> | null = null

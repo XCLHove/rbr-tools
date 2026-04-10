@@ -5,7 +5,6 @@ import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import { onMounted } from 'vue'
 import { checkUpdate } from '@/utils/checkUpdate.ts'
-
 const elementPlusStore = useElementPlusStore()
 const { buttonConfig, locale, messageConfig } = storeToRefs(elementPlusStore)
 const route = useRoute()

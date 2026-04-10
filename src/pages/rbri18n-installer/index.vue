@@ -14,6 +14,7 @@ import RbrInstallPathText from '@/components/rbr-install-path-text/rbr-install-p
 import PageReadme from '@/components/page-readme/page-readme.vue'
 import ReadmeUrl from './README.md?url'
 import { decodeMulti } from '@/utils/base64Utils.ts'
+import DonationCodeValidateDialog from '@/components/donation-code-validate-dialog/donation-code-validate-dialog.vue'
 
 const rbrToolsStore = useRbrToolsStore()
 const { rbrInstallPath, rbrInstallPathValid } = storeToRefs(rbrToolsStore)
@@ -208,6 +209,8 @@ onMounted(async () => {
       </el-table-column>
     </el-table>
     <page-readme :url="ReadmeUrl" />
+
+    <donation-code-validate-dialog />
   </div>
 </template>
 
