@@ -1,6 +1,6 @@
 [package]
 name = "rbr-tools"
-version = "0.260410.123751"
+version = "0.260410.133221"
 description = "RBRi18n Installer"
 authors = [ "xclhove" ]
 edition = "2021"

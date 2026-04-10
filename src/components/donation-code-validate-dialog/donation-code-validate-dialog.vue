@@ -13,7 +13,6 @@ const donationCode = ref('')
 
 async function validate() {
   const tauriStore = await getTauriStore()
-  await tauriStore.delete(tauriStoreKey.RBR_TOOLS_DONATION_CODE)
   const code = (await tauriStore.get<string>(tauriStoreKey.RBR_TOOLS_DONATION_CODE)) || donationCode.value
   if (!code) {
     ElMessage.warning('请填写捐赠码！')
