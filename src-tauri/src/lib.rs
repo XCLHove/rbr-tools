@@ -6,6 +6,7 @@ mod rbri18n_config;
 mod rbri18n_installer;
 mod rsf_config;
 mod sim_rally_cn_config;
+mod sim_rally_cn_installer;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -37,7 +38,9 @@ pub fn run() {
             rsf_config::write_rsf_config,
             rsf_config::read_rsf_config,
             sim_rally_cn_config::write_sim_rally_cn_config,
-            sim_rally_cn_config::read_sim_rally_cn_config
+            sim_rally_cn_config::read_sim_rally_cn_config,
+            sim_rally_cn_installer::check_sim_rally_cn_install_status,
+            sim_rally_cn_installer::install_sim_rally_cn
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
