@@ -34,15 +34,10 @@ const mirror = ref({
   url: mirrorUrlList.value[0],
 })
 
-watch(
-  () => githubReleaseInfoList.value,
-  () => {
-    currentReleaseInfo.value = githubReleaseInfoList.value[0] ?? null
-  },
-)
-
 async function getRelease() {
   await Promise.all([getLatestRelease(), getReleaseList()])
+  currentReleaseInfo.value =
+    githubReleaseInfoList.value.find((info) => info.id === latestReleaseInfo.value?.id) || githubReleaseInfoList.value[0] || null
 }
 
 async function getReleaseList() {

@@ -10,6 +10,7 @@ import useRbrToolsStore from '@/stores/useRbrToolsStore.ts'
 import { storeToRefs } from 'pinia'
 import { Asset, GiteeReleaseInfo } from '@/pages/sim-rally-cn-installer/type.ts'
 import { checkSimRallyCNInstallStatusApi, installSimRallyCNApi } from '@/invoke-apis/sim-rally-cn-installer.ts'
+import RbrInstallPathText from '@/components/rbr-install-path-text/rbr-install-path-text.vue'
 
 const rbrToolsStore = useRbrToolsStore()
 const { rbrInstallPath, rbrInstallPathValid } = storeToRefs(rbrToolsStore)
@@ -26,15 +27,10 @@ const currentReleaseAsserts = computed(() => {
 })
 const simRallyCNInstallStatus = ref<'已安装' | '未安装' | '已禁用' | '未知'>('未知')
 
-watch(
-  () => giteeReleaseInfoList.value,
-  () => {
-    currentReleaseInfo.value = giteeReleaseInfoList.value[0] ?? null
-  },
-)
-
 async function getRelease() {
   await Promise.all([getLatestRelease(), getReleaseList()])
+  currentReleaseInfo.value =
+    giteeReleaseInfoList.value.find((info) => info.id === latestReleaseInfo.value?.id) || giteeReleaseInfoList.value[0] || null
 }
 
 async function getReleaseList() {
@@ -131,6 +127,7 @@ onMounted(async () => {
 <template>
   <div class="home-page w-full h-full flex flex-col">
     <el-text class="text-center" style="font-size: 32px">SimRallyCN 一键安装</el-text>
+    <rbr-install-path-text />
     <div class="flex flex-row items-center mt-1">
       <div>
         <el-tag
