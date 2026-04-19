@@ -8,7 +8,7 @@ import router from '@/router'
 import PageReadme from '@/components/page-readme/page-readme.vue'
 import ReadmeUrl from './README.md?url'
 
-const dialogVisible = ref(true)
+const dialogVisible = ref(false)
 const donationCode = ref('')
 
 async function validate() {
@@ -16,11 +16,13 @@ async function validate() {
   const code = (await tauriStore.get<string>(tauriStoreKey.RBR_TOOLS_DONATION_CODE)) || donationCode.value
   if (!code) {
     ElMessage.warning('请填写捐赠码！')
+    dialogVisible.value = true
     return
   }
   const valid = validateDonationCode(code)
   if (!valid) {
     ElMessage.error('捐赠码无效！')
+    dialogVisible.value = true
     return
   }
   await tauriStore.set(tauriStoreKey.RBR_TOOLS_DONATION_CODE, code)
