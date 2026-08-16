@@ -1,6 +1,6 @@
 [package]
 name = "rbr-tools"
-version = "0.260419.161024"
+version = "0.260816.191859"
 description = "RBRi18n Installer"
 authors = [ "xclhove" ]
 edition = "2021"
@@ -26,7 +26,10 @@ tauri-plugin-store = "2"
 lazy_static = "1.5.0"
 notify = "8.2.0"
 fontdb = "0.23.0"
-windows = { version = "0.61", features = [ "Win32_Storage_FileSystem" ] }
+
+  [dependencies.windows]
+  version = "0.61"
+  features = [ "Win32_Storage_FileSystem" ]
 
   [dependencies.tauri]
   version = "2"
