@@ -1,3 +1,4 @@
+use crate::rbr_tools;
 use std::fs::File;
 use std::time::Duration;
 use std::{fs, io::Write, path::Path};
@@ -17,6 +18,12 @@ pub fn check_sim_rally_cn_install_status(rbr_install_path: String) -> Result<Str
     }
 
     Ok("已安装".to_string())
+}
+
+#[tauri::command]
+pub fn get_sim_rally_cn_version_api(rbr_install_path: String) -> Result<String, String> {
+    let dll_path = format!("{}/Plugins/SimRallyCN.dll", rbr_install_path);
+    rbr_tools::get_dll_product_version(dll_path)
 }
 
 #[tauri::command]

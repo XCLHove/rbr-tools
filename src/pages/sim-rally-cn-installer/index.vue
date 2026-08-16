@@ -9,7 +9,7 @@ import { Refresh } from '@element-plus/icons-vue'
 import useRbrToolsStore from '@/stores/useRbrToolsStore.ts'
 import { storeToRefs } from 'pinia'
 import { Asset, GiteeReleaseInfo } from '@/pages/sim-rally-cn-installer/type.ts'
-import { checkSimRallyCNInstallStatusApi, installSimRallyCNApi } from '@/invoke-apis/sim-rally-cn-installer.ts'
+import { checkSimRallyCNInstallStatusApi, getSimRallyCNVersionApi, installSimRallyCNApi } from '@/invoke-apis/sim-rally-cn-installer.ts'
 import RbrInstallPathText from '@/components/rbr-install-path-text/rbr-install-path-text.vue'
 
 const rbrToolsStore = useRbrToolsStore()
@@ -26,6 +26,7 @@ const currentReleaseAsserts = computed(() => {
   return asserts.filter((assert) => assert.name.toUpperCase().includes('SimRallyCN'.toUpperCase()))
 })
 const simRallyCNInstallStatus = ref<'已安装' | '未安装' | '已禁用' | '未知'>('未知')
+const dllVersion = ref('')
 
 async function getRelease() {
   await Promise.all([getLatestRelease(), getReleaseList()])
@@ -80,6 +81,10 @@ async function checkSimRallyCNInstallStatus() {
     .finally(() => loadingEnd())
 }
 
+async function checkSimRallyCNVersion() {
+  dllVersion.value = await getSimRallyCNVersionApi(rbrInstallPath.value).finally(loadingStart('获取插件当前版本...'))
+}
+
 async function install(asset: Asset) {
   if (!rbrInstallPathValid.value.valid) {
     ElMessage.error(`请前往配置界面配置正确的 RBR 安装目录！`)
@@ -97,6 +102,7 @@ async function install(asset: Asset) {
   installSimRallyCNApi(rbrInstallPath.value, asset.browser_download_url)
     .then(() => {
       checkSimRallyCNInstallStatus()
+      checkSimRallyCNVersion()
       ElMessage.success('安装成功！')
     })
     .catch((e) => {
@@ -120,6 +126,7 @@ function copyDownloadUrl(asset: Asset) {
 onMounted(async () => {
   await rbrToolsStore.waitingLoad()
   await checkSimRallyCNInstallStatus()
+  await checkSimRallyCNVersion()
   await getRelease()
 })
 </script>
@@ -135,7 +142,9 @@ onMounted(async () => {
           class="text-nowrap"
           size="large"
         >
-          <span style="width: 100px">{{ !rbrInstallPathValid.valid ? rbrInstallPathValid.message : simRallyCNInstallStatus }}</span>
+          <span style="width: 100px">{{
+            !rbrInstallPathValid.valid ? rbrInstallPathValid.message : simRallyCNInstallStatus + (dllVersion ? `(${dllVersion})` : '')
+          }}</span>
         </el-tag>
       </div>
       <el-select v-model="currentReleaseInfo" placeholder="请选择版本" value-key="id">

@@ -13,3 +13,9 @@ export const installSimRallyCNApi = (rbrInstallPath: string, zipFileUrl: string,
     timeoutSeconds,
   })
 }
+
+export const getSimRallyCNVersionApi = (rbrInstallPath: string) => {
+  return invokeWrapper<string>('get_sim_rally_cn_version_api', {
+    rbrInstallPath,
+  })
+}

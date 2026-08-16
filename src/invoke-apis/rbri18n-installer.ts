@@ -13,3 +13,9 @@ export const installRBRi18nApi = (rbrInstallPath: string, zipFileUrl: string, ti
     timeoutSeconds,
   })
 }
+
+export const getRBRi18nVersionApi = (rbrInstallPath: string) => {
+  return invokeWrapper<string>('get_rbri18n_version_api', {
+    rbrInstallPath,
+  })
+}

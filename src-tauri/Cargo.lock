@@ -3632,6 +3632,7 @@ dependencies = [
  "tauri-plugin-store",
  "tauri-plugin-updater",
  "tokio",
+ "windows",
  "zip 0.5.13",
 ]
 

@@ -25,6 +25,7 @@ pub fn run() {
             file_log::log_error,
             rbri18n_installer::check_rbri18n_install_status,
             rbri18n_installer::install_rbri18n,
+            rbri18n_installer::get_rbri18n_version_api,
             rbr_tools::validate_rbr_install_path,
             cancel_config_readonly::get_config_readonly,
             cancel_config_readonly::cancel_config_readonly,
@@ -40,7 +41,8 @@ pub fn run() {
             sim_rally_cn_config::write_sim_rally_cn_config,
             sim_rally_cn_config::read_sim_rally_cn_config,
             sim_rally_cn_installer::check_sim_rally_cn_install_status,
-            sim_rally_cn_installer::install_sim_rally_cn
+            sim_rally_cn_installer::install_sim_rally_cn,
+            sim_rally_cn_installer::get_sim_rally_cn_version_api
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,3 +1,4 @@
+use crate::rbr_tools;
 use std::fs::File;
 use std::time::Duration;
 use std::{fs, io::Write, path::Path};
@@ -11,6 +12,12 @@ pub fn check_rbri18n_install_status(rbr_install_path: String) -> Result<String, 
     }
 
     Ok("已安装".to_string())
+}
+
+#[tauri::command]
+pub fn get_rbri18n_version_api(rbr_install_path: String) -> Result<String, String> {
+    let dll_path = format!("{}/Plugins/RBRi18n.dll", rbr_install_path);
+    rbr_tools::get_dll_product_version(dll_path)
 }
 
 #[tauri::command]

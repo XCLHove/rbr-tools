@@ -5,7 +5,7 @@ import { Asset, GithubReleaseInfo } from '@/pages/index/type.ts'
 import { loadingStart } from '@/utils/LoadingUtils.ts'
 import { log_error } from '@/invoke-apis/file-log.ts'
 import { dayjs, ElMessage, ElMessageBox } from 'element-plus'
-import { checkRBRi18nInstallStatusApi, installRBRi18nApi } from '@/invoke-apis/rbri18n-installer.ts'
+import { checkRBRi18nInstallStatusApi, getRBRi18nVersionApi, installRBRi18nApi } from '@/invoke-apis/rbri18n-installer.ts'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { Refresh } from '@element-plus/icons-vue'
 import useRbrToolsStore from '@/stores/useRbrToolsStore.ts'
@@ -33,6 +33,7 @@ const mirror = ref({
   enable: false,
   url: mirrorUrlList.value[0],
 })
+const dllVersion = ref('')
 
 async function getRelease() {
   await Promise.all([getLatestRelease(), getReleaseList()])
@@ -87,6 +88,10 @@ async function checkRBRi18nInstallStatus() {
     .finally(() => loadingEnd())
 }
 
+async function checkRBRi18nVersion() {
+  dllVersion.value = await getRBRi18nVersionApi(rbrInstallPath.value).finally(loadingStart('获取插件当前版本...'))
+}
+
 async function install(asset: Asset) {
   if (!rbrInstallPathValid.value.valid) {
     ElMessage.error(`请前往配置界面配置正确的 RBR 安装目录！`)
@@ -104,6 +109,7 @@ async function install(asset: Asset) {
   installRBRi18nApi(rbrInstallPath.value, replaceWithMirrorUrl(asset.browser_download_url))
     .then(() => {
       checkRBRi18nInstallStatus()
+      checkRBRi18nVersion()
       ElMessage.success('安装成功！')
     })
     .catch((e) => {
@@ -147,6 +153,7 @@ function onChangeMirrorEnable(enable: boolean) {
 onMounted(async () => {
   await rbrToolsStore.waitingLoad()
   await checkRBRi18nInstallStatus()
+  await checkRBRi18nVersion()
   await getRelease()
 })
 </script>
@@ -162,7 +169,9 @@ onMounted(async () => {
           class="text-nowrap"
           size="large"
         >
-          <span style="width: 100px">{{ !rbrInstallPathValid.valid ? rbrInstallPathValid.message : i18nInstallStatus }}</span>
+          <span style="width: 100px">{{
+            !rbrInstallPathValid.valid ? rbrInstallPathValid.message : i18nInstallStatus + (dllVersion ? `(${dllVersion})` : '')
+          }}</span>
         </el-tag>
       </div>
       <el-select v-model="currentReleaseInfo" placeholder="请选择版本" value-key="id">

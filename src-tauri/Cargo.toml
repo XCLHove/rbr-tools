@@ -26,6 +26,7 @@ tauri-plugin-store = "2"
 lazy_static = "1.5.0"
 notify = "8.2.0"
 fontdb = "0.23.0"
+windows = { version = "0.61", features = [ "Win32_Storage_FileSystem" ] }
 
   [dependencies.tauri]
   version = "2"
