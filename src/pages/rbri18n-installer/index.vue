@@ -205,7 +205,7 @@ onMounted(async () => {
     </el-table>
     <page-readme :url="ReadmeUrl" />
 
-    <donation-code-validate-dialog />
+    <donation-code-validate-dialog nullable />
   </div>
 </template>
 

@@ -8,12 +8,16 @@ import router from '@/router'
 import PageReadme from '@/components/page-readme/page-readme.vue'
 import ReadmeUrl from './README.md?url'
 
+const props = defineProps<{
+  nullable?: boolean
+}>()
 const dialogVisible = ref(false)
 const donationCode = ref('')
 
 async function validate() {
   const tauriStore = await getTauriStore()
   const code = (await tauriStore.get<string>(tauriStoreKey.RBR_TOOLS_DONATION_CODE)) || donationCode.value
+
   if (!code) {
     ElMessage.warning('请填写捐赠码！')
     dialogVisible.value = true
@@ -36,7 +40,8 @@ function doValidate() {
 }
 
 function beforeClose(_done: () => void) {
-  router.replace('/')
+  if (props.nullable) dialogVisible.value = false
+  else router.replace('/')
 }
 
 onMounted(() => {
