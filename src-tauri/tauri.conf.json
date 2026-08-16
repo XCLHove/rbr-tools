@@ -1,7 +1,7 @@
 {
   "$schema": "tauri.conf.schema.json",
   "productName": "rbr-tools",
-  "version": "0.260816.191859",
+  "version": "0.260816.202337",
   "identifier": "com.xclhove.rbr-tools",
   "build": {
     "beforeDevCommand": "npm run dev",
