@@ -43,6 +43,12 @@ onMounted(() => rbrToolsStore.load())
             </el-text>
           </div>
         </el-descriptions-item>
+        <el-descriptions-item label="关闭程序时">
+          <el-radio-group v-model="rbrToolsStore.closeBehavior">
+            <el-radio value="minimize">最小化</el-radio>
+            <el-radio value="exit">退出</el-radio>
+          </el-radio-group>
+        </el-descriptions-item>
       </el-descriptions>
     </el-scrollbar>
     <el-button class="mt-1 mb-1" type="primary" @click="rbrToolsStore.save()">保存</el-button>

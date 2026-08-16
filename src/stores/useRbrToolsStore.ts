@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { log_error } from '@/invoke-apis/file-log.ts'
 import { ElMessage } from 'element-plus'
 import { validateRbrInstallPathApi } from '@/invoke-apis/rbr-tools.ts'
-import { getTauriStore, tauriStoreKey } from '@/utils/tauriStoreUtils.ts'
+import { getTauriStore, tauriStoreKey, DEFAULT_CLOSE_BEHAVIOR } from '@/utils/tauriStoreUtils.ts'
 import { loadingStart } from '@/utils/LoadingUtils.ts'
 
 const useRbrToolsStore = defineStore('rbrTools', () => {
@@ -12,6 +12,7 @@ const useRbrToolsStore = defineStore('rbrTools', () => {
     valid: false,
     message: '请选择 RBR 安装目录',
   })
+  const closeBehavior = ref<string>(DEFAULT_CLOSE_BEHAVIOR)
   watch(
     () => rbrInstallPath.value,
     () => validateRbrInstallPath(),
@@ -33,6 +34,16 @@ const useRbrToolsStore = defineStore('rbrTools', () => {
     await validateRbrInstallPath()
   }
 
+  async function loadCloseBehavior() {
+    const tauriStore = await getTauriStore()
+    closeBehavior.value = (await tauriStore.get<string>(tauriStoreKey.CLOSE_BEHAVIOR)) || DEFAULT_CLOSE_BEHAVIOR
+  }
+
+  async function saveCloseBehavior() {
+    const tauriStore = await getTauriStore()
+    await tauriStore.set(tauriStoreKey.CLOSE_BEHAVIOR, closeBehavior.value)
+  }
+
   function load() {
     if (loadPromise) return
     loadPromise = Promise.resolve()
@@ -40,6 +51,7 @@ const useRbrToolsStore = defineStore('rbrTools', () => {
         const loadingEnd = loadingStart('加载配置...')
         try {
           await loadRbrInstallPath()
+          await loadCloseBehavior()
         } catch (e: any) {
           const errMsg = e?.message || e?.toString()
           log_error(errMsg)
@@ -70,6 +82,7 @@ const useRbrToolsStore = defineStore('rbrTools', () => {
         return
       }
       await saveRbrInstallPath()
+      await saveCloseBehavior()
 
       ElMessage.success('保存完毕！')
       load()
@@ -87,10 +100,12 @@ const useRbrToolsStore = defineStore('rbrTools', () => {
   return {
     rbrInstallPath,
     rbrInstallPathValid: computed(() => rbrInstallPathValid.value),
+    closeBehavior,
     validateRbrInstallPath,
     save,
     load,
     waitingLoad,
+    saveCloseBehavior,
   }
 })
 
