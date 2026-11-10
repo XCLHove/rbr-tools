@@ -6,7 +6,7 @@ export const checkSimRallyCNInstallStatusApi = (rbrInstallPath: string) => {
   })
 }
 
-export const installSimRallyCNApi = (rbrInstallPath: string, zipFileUrl: string, timeoutSeconds: number = 15) => {
+export const installSimRallyCNApi = (rbrInstallPath: string, zipFileUrl: string, timeoutSeconds: number = 120) => {
   return invokeWrapper<string>('install_sim_rally_cn', {
     rbrInstallPath,
     zipFileUrl,
