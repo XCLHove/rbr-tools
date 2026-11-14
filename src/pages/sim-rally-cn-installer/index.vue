@@ -125,9 +125,9 @@ function copyDownloadUrl(asset: Asset) {
 
 onMounted(async () => {
   await rbrToolsStore.waitingLoad()
-  await checkSimRallyCNInstallStatus()
-  await checkSimRallyCNVersion()
-  await getRelease()
+  await getRelease().catch(() => {})
+  await checkSimRallyCNInstallStatus().catch(() => {})
+  await checkSimRallyCNVersion().catch(() => {})
 })
 </script>
 

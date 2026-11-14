@@ -152,9 +152,9 @@ function onChangeMirrorEnable(enable: boolean) {
 
 onMounted(async () => {
   await rbrToolsStore.waitingLoad()
-  await checkRBRi18nInstallStatus()
-  await checkRBRi18nVersion()
-  await getRelease()
+  await getRelease().catch(() => {})
+  await checkRBRi18nInstallStatus().catch(() => {})
+  await checkRBRi18nVersion().catch(() => {})
 })
 </script>
 
